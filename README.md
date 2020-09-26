@@ -92,9 +92,13 @@ To do this, you need to call the addDrawStatusChangedListener() method of the Ma
 ```
 Here, I used the x and y to create a point and send the point to a method which I use to update the TextViews and also reverse geocode the coordinates to get the address.
 The Check the content_main.xml and MainActivity.java in this repository and modify yours accordingly.
-Also copy the AuthenticationInteractor.java file to your package directory. THis is the class used for the volley implementation.
+Also copy the AuthenticationInteractor.java file to your package directory. This is the class used for the volley implementation.
 Make sure there are no errors and run your project.
 If all things work well, you can see the screenshot below and clicking on the share button will open the sharing window.
+MainActivity:
+![MainActivity](https://sambusgeospatial.maps.arcgis.com/sharing/rest/content/items/3474c5069efc4f399b115bbd36a0a179/data)
+Sharing:
+![Sharing](https://sambusgeospatial.maps.arcgis.com/sharing/rest/content/items/23b81df51c91488dad1344802b10aa5b/data)
 Other things used in this project include:
 - Material Design
 - Constraint layout

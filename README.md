@@ -96,9 +96,10 @@ Also copy the AuthenticationInteractor.java file to your package directory. This
 Make sure there are no errors and run your project.
 If all things work well, you can see the screenshot below and clicking on the share button will open the sharing window.
 MainActivity:
-![MainActivity](https://sambusgeospatial.maps.arcgis.com/sharing/rest/content/items/3474c5069efc4f399b115bbd36a0a179/data)
+<image alt="MainActivity" src="https://sambusgeospatial.maps.arcgis.com/sharing/rest/content/items/3474c5069efc4f399b115bbd36a0a179/data" width="300px" />
 Sharing:
-![Sharing](https://sambusgeospatial.maps.arcgis.com/sharing/rest/content/items/23b81df51c91488dad1344802b10aa5b/data)
+<image alt="Sharing" src="https://sambusgeospatial.maps.arcgis.com/sharing/rest/content/items/23b81df51c91488dad1344802b10aa5b/data" width="300px" />
+
 Other things used in this project include:
 - Material Design
 - Constraint layout

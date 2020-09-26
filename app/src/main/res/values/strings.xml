@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Locashare</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="location_permission_denied">User denied permission for device location.</string>
+    <string name="share">Share</string>
+    <string name="latitude_y">Latitude (Y):</string>
+    <string name="longitude_x">Longitude (X):</string>
+    <string name="you_re_here">You\'re here</string>
+    <string name="grocode_url">https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode</string>
+</resources>

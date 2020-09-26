@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.esri.arcgisruntime.mapping.view.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/materialCardView"
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/locTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fab_margin"
+                android:padding="@dimen/fab_margin"
+                android:layout_marginEnd="@dimen/fab_margin"
+                android:text="@string/you_re_here" />
+
+            <TextView
+                android:id="@+id/locAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fab_margin"
+                android:layout_marginEnd="@dimen/fab_margin"
+                android:paddingStart="@dimen/fab_margin"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:paddingEnd="@dimen/fab_margin"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/locTitle" />
+
+            <LinearLayout
+                android:id="@+id/labelsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fab_margin"
+                android:layout_marginEnd="@dimen/fab_margin"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/locAddress">
+
+                <TextView
+                    android:id="@+id/longitudeLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="@dimen/fab_margin"
+                    android:text="@string/longitude_x" />
+
+                <TextView
+                    android:id="@+id/latitudeLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="@dimen/fab_margin"
+                    android:text="@string/latitude_y" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/valuesLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/fab_margin"
+                android:layout_marginBottom="20dp"
+                android:layout_marginEnd="@dimen/fab_margin"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/labelsLayout">
+
+                <TextView
+                    android:id="@+id/longitudeDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="@dimen/fab_margin"
+                    android:paddingEnd="@dimen/fab_margin"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/latitudeDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="@dimen/fab_margin"
+                    android:paddingEnd="@dimen/fab_margin"
+                    android:textSize="25sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/fab_margin"
+                android:backgroundTint="@color/colorPrimary"
+                android:text="@string/share"
+                android:textStyle="bold"
+                android:layout_gravity="end|bottom"
+                app:icon="@drawable/ic_share"
+                android:enabled="false"
+                android:id="@+id/shareBtn"
+                app:iconTint="@color/colorWhite"
+                android:textColor="@color/colorWhite"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

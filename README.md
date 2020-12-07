@@ -1,6 +1,6 @@
 ## Introduction
 
-Locashare is an Android location sharing application built using Esri's ArcGIS [Runtime SDK](https://developers.arcgis.com/arcgis-runtime/) and [REST API](https://developers.arcgis.com/rest/). It tracks the users location and provides an implicit sharing intent to share the location using.
+Locashare is an Android location sharing application built using Esri's ArcGIS [Runtime SDK](https://developers.arcgis.com/arcgis-runtime/) and [REST API](https://developers.arcgis.com/rest/). It tracks the users location and provides an implicit sharing intent to share the location using the Android Content Providers API.
 
 ## Usage
 
@@ -16,7 +16,7 @@ You're also welcome to contribute to this source, just fork the repo, create a b
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
+This sample is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).
 
 ## How to build this sample
 

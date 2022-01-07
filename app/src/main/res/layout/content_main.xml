@@ -4,12 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <com.esri.arcgisruntime.mapping.view.MapView
-        android:id="@+id/mapView"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:id="@+id/mapContainer"
+        android:layout_weight="1">
+        <com.esri.arcgisruntime.mapping.view.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="5dp"
+            android:src="@drawable/logo" />
+    </RelativeLayout>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/materialCardView"

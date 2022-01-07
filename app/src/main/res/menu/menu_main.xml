@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:title="Change Basemap">
+    <item
+        android:id="@+id/action_dark_grey"
+        app:showAsAction="never"
+        android:title="Dark Grey Canvas">
+    </item>
+    <item
+        android:id="@+id/action_light_grey"
+        app:showAsAction="never"
+        android:title="Light Grey Canvas">
+    </item>
+    <item
+        android:id="@+id/action_osm"
+        app:showAsAction="never"
+        android:title="OpenStreetMap">
+    </item>
+    <item
+        android:id="@+id/action_imagery"
+        app:showAsAction="never"
+        android:title="Imagery with labels">
+    </item>
+    <item
+        android:id="@+id/action_streets"
+        app:showAsAction="never"
+        android:title="Street (Night)">
+    </item>
+    <item
+        android:id="@+id/action_default"
+        app:showAsAction="never"
+        android:title="Default (Topography)">
+    </item>
+</menu>

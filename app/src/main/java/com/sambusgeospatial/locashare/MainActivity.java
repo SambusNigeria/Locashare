@@ -4,15 +4,24 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.media.MediaActionSound;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -20,6 +29,7 @@ import androidx.core.content.FileProvider;
 
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
+import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.geometry.Point;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
@@ -44,95 +54,108 @@ public class MainActivity extends AppCompatActivity {
     TextView locAddress;
     TextView longitudeDisplay;
     TextView latitudeDisplay;
+    RelativeLayout mapContainer;
     ExtendedFloatingActionButton shareBtn;
-    private boolean locationSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setOverflowIcon(AppCompatResources.getDrawable(this, R.drawable.ic_basemap));
         setSupportActionBar(toolbar);
+
 
         mMapView = findViewById(R.id.mapView);
         locAddress = findViewById(R.id.locAddress);
         longitudeDisplay = findViewById(R.id.longitudeDisplay);
         latitudeDisplay = findViewById(R.id.latitudeDisplay);
         shareBtn = findViewById(R.id.shareBtn);
-        shareBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                shareBitmap(getScreenshot(mMapView));
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "I just used Locashare to share my location! Find me here: \n\nLongitude (X): "
+        mapContainer = findViewById(R.id.mapContainer);
+
+        shareBtn.setOnClickListener(view -> {
+            if (screenshot == null) {
+                captureScreenshotAsync();
+            }
+
+            final Bitmap bitmap = addWaterMark(screenshot);
+            try {
+                // getExternalFilesDir() + "/Pictures" should match the declaration in fileprovider.xml paths
+                File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "my_location" + System.currentTimeMillis() + ".png");
+                FileOutputStream fOut = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                fOut.flush();
+                fOut.close();
+                file.setReadable(true, false);
+                final Intent intent = new Intent(android.content.Intent.ACTION_SEND);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                // wrap File object into a content provider. NOTE: authority here should match authority in manifest declaration
+                Uri bmpUri = FileProvider.getUriForFile(MainActivity.this, "com.sambusgeospatial.fileprovider.Locashare", file);
+
+                intent.putExtra(Intent.EXTRA_STREAM, bmpUri);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_TEXT, "I just used Locashare to share my location! Find me here: \n\nLongitude (X): "
                         + longitudeDisplay.getText().toString() + "\nLatitude (Y): " + latitudeDisplay.getText().toString() + "\n"
                         + locAddress.getText().toString() + "\n\nView on google maps: https://www.google.com/maps/search/?api=1&query=" + latitudeDisplay.getText().toString() + "," + longitudeDisplay.getText().toString());
-                sendIntent.setType("text/plain");
-                Intent shareIntent = Intent.createChooser(sendIntent, "Share your location with");
-                startActivity(shareIntent);
+                startActivity(Intent.createChooser(intent, "Share location via"));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
         setupMap();
         setupLocationDisplay();
     }
 
-    private void shareBitmap(Bitmap screenshot) {
-        //---Save bitmap to external cache directory---//
-        //get cache directory
-        File cachePath = new File(getExternalCacheDir(), "images");
-        cachePath.mkdirs();
+    Bitmap screenshot = (Bitmap) null;
 
-        //create png file
-        File file = new File(cachePath, "last_location.png");
-        FileOutputStream fileOutputStream;
-        try {
-            fileOutputStream = new FileOutputStream(file);
-            screenshot.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
-            fileOutputStream.flush();
-            fileOutputStream.close();
+    public void captureScreenshotAsync() {
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // export the image from the mMapView
+        final ListenableFuture<Bitmap> export = mMapView.exportImageAsync();
+        export.addDoneListener(() -> {
+            try {
+                screenshot = export.get();
+                Log.d("TAG", "Captured the image!!");
 
-        //---Share File---//
-        //get file uri
-        Uri myImageFileUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", file);
+            } catch (Exception e) {
+                Toast
+                        .makeText(getApplicationContext(), "Failed to capture screenshot because:" + e.getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                Log.e("GFG", "Failed to capture screenshot because:" + e.getMessage());
+            }
+        });
 
-        //create a intent
-
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "I just used Locashare to share my location! Find me here: \n\nLongitude (X): " + longitudeDisplay.getText().toString() + "\nLatitude (Y): " + latitudeDisplay.getText().toString() + "\n" + locAddress.getText().toString() + "View on google maps: https://www.google.com/maps/@" + longitudeDisplay.getText().toString() + "," + latitudeDisplay.getText().toString() + ",15z");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, myImageFileUri);
-        shareIntent.setType("image/jpeg");
-
-        startActivity(Intent.createChooser(shareIntent, "Share your location via: "));
     }
 
-    private Bitmap getScreenshot(View view) {
-        view.setDrawingCacheEnabled(true);
-        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
-        view.setDrawingCacheEnabled(false);
+    private Bitmap addWaterMark(Bitmap src) {
+        int w = src.getWidth();
+        int h = src.getHeight();
+        Bitmap result = Bitmap.createBitmap(w, h, src.getConfig());
+        Canvas canvas = new Canvas(result);
+        canvas.drawBitmap(src, 0, 0, null);
 
-        return bitmap;
+        Bitmap waterMark = BitmapFactory.decodeResource(this.getResources(), R.drawable.logo1);
+        canvas.drawBitmap(waterMark, 5, 5, null);
+
+        return result;
     }
+
+    ArcGISMap map;
 
     private void setupMap() {
         if (mMapView != null) {
-            Basemap.Type baseMapType = Basemap.Type.OPEN_STREET_MAP;
+            Basemap.Type baseMapType = Basemap.Type.TOPOGRAPHIC_VECTOR;
             double latitude = 0;
             double longitude = 0;
-            int levelOfDetail = 11;
-            ArcGISMap map = new ArcGISMap(baseMapType, latitude, longitude, levelOfDetail);
-            mMapView.setMagnifierEnabled(true);
+            int levelOfDetail = 16;
+            map = new ArcGISMap(baseMapType, latitude, longitude, levelOfDetail);
+
             mMapView.setMap(map);
             mMapView.addDrawStatusChangedListener(drawStatusChangedEvent -> {
                 Point point = new Point(mMapView.getLocationDisplay().getLocation().getPosition().getX(), mMapView.getLocationDisplay().getLocation().getPosition().getY());
                 updateLocation(point);
+                captureScreenshotAsync();
             });
         }
     }
@@ -232,6 +255,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         // If request is cancelled, the result arrays are empty.
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
             // Location permission was granted. This would have been triggered in response to failing to start the
@@ -245,27 +269,49 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, getResources().getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show();
         }
     }
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//
-//        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_dark_grey) {
+            map.setBasemap(Basemap.createDarkGrayCanvasVector());
+            return true;
+        }
+        if (id == R.id.action_light_grey) {
+            map.setBasemap(Basemap.createLightGrayCanvasVector());
+            return true;
+        }
+        if (id == R.id.action_osm) {
+            map.setBasemap(Basemap.createOpenStreetMap());
+            return true;
+        }
+        if (id == R.id.action_imagery) {
+            map.setBasemap(Basemap.createImageryWithLabelsVector());
+            return true;
+        }
+        if (id == R.id.action_streets) {
+            map.setBasemap(Basemap.createStreetsNightVector());
+            return true;
+        }
+        if (id == R.id.action_default) {
+            map.setBasemap(Basemap.createTopographicVector());
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
 
     @Override
